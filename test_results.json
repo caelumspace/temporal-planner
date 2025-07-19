@@ -1,0 +1,88 @@
+{
+  "timestamp": "1752925472",
+  "total_tests": 4,
+  "passed_tests": 4,
+  "failed_tests": 0,
+  "test_results": [
+    {
+      "name": "Simple Robot Domain",
+      "status": "Passed",
+      "duration_ms": 32,
+      "description": "Successfully parsed Simple Robot Domain domain with 4 actions",
+      "metrics": {
+        "actions_parsed": 4,
+        "durative_actions": 1,
+        "initial_facts": 5,
+        "goal_conditions": 2,
+        "parse_time_ms": 31,
+        "search_time_ms": null,
+        "plan_length": null,
+        "plan_cost": null
+      },
+      "error_message": null
+    },
+    {
+      "name": "Blocks World Domain",
+      "status": "Passed",
+      "duration_ms": 32,
+      "description": "Successfully parsed Blocks World Domain domain with 4 actions",
+      "metrics": {
+        "actions_parsed": 4,
+        "durative_actions": 1,
+        "initial_facts": 5,
+        "goal_conditions": 2,
+        "parse_time_ms": 32,
+        "search_time_ms": null,
+        "plan_length": null,
+        "plan_cost": null
+      },
+      "error_message": null
+    },
+    {
+      "name": "Factory Automation",
+      "status": "Passed",
+      "duration_ms": 26,
+      "description": "Successfully parsed Factory Automation domain with 4 actions",
+      "metrics": {
+        "actions_parsed": 4,
+        "durative_actions": 0,
+        "initial_facts": 8,
+        "goal_conditions": 4,
+        "parse_time_ms": 26,
+        "search_time_ms": null,
+        "plan_length": null,
+        "plan_cost": null
+      },
+      "error_message": null
+    },
+    {
+      "name": "Planning Integration",
+      "status": "Passed",
+      "duration_ms": 0,
+      "description": "Planning system integration test",
+      "metrics": {
+        "actions_parsed": 1,
+        "durative_actions": 0,
+        "initial_facts": 2,
+        "goal_conditions": 1,
+        "parse_time_ms": null,
+        "search_time_ms": 0,
+        "plan_length": 0,
+        "plan_cost": 0.0
+      },
+      "error_message": null
+    }
+  ],
+  "summary": {
+    "success_rate": 100.0,
+    "total_actions_parsed": 12,
+    "total_durative_actions": 2,
+    "average_parse_time_ms": 22.5,
+    "domains_tested": [
+      "Simple Robot Domain",
+      "Blocks World Domain",
+      "Factory Automation"
+    ],
+    "planning_successful": true
+  }
+}

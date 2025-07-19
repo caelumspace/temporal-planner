@@ -1,0 +1,68 @@
+[package]
+name = "temporal_planner"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "A temporal planning system implementing Simple Temporal Networks"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Core dependencies
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0.12"
+anyhow = "1.0"
+regex = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Data structures
+indexmap = "2.0"
+petgraph = "0.8.2"
+
+# Numerical computation
+nalgebra = "0.33.2"
+num-traits = "0.2"
+
+# Logging
+log = "0.4"
+env_logger = "0.11.8"
+
+# Command line interface
+clap = { version = "4.4", features = ["derive"] }
+
+# Optional: for parallel processing
+rayon = { version = "1.7", optional = true }
+
+[dev-dependencies]
+criterion = "0.6.0"
+proptest = "1.2"
+pretty_assertions = "1.4"
+
+[features]
+default = []
+parallel = ["rayon"]
+
+[[bin]]
+name = "pddl_parser_demo"
+path = "src/main.rs"
+
+[[bin]]
+name = "e2e_tests"
+path = "src/bin/e2e_tests.rs"
+
+[[bin]]
+name = "comprehensive_tests"
+path = "src/bin/comprehensive_tests.rs"
+
+[[bin]]
+name = "benchmark"
+path = "src/bin/benchmark.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+debug = true

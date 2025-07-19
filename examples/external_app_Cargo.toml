@@ -1,0 +1,46 @@
+# Example Cargo.toml for an external application using temporal_planner
+
+[package]
+name = "my-planning-app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Add temporal_planner as a dependency
+temporal_planner = { git = "https://github.com/caelumspace/temporal-planner.git" }
+
+# Or from a local path during development:
+# temporal_planner = { path = "../temporal_planner" }
+
+# Or with specific features:
+# temporal_planner = { git = "https://github.com/caelumspace/temporal-planner.git", features = ["parallel"] }
+
+# Or when published to crates.io (future):
+# temporal_planner = "0.1.0"
+
+# Other dependencies your app might need
+anyhow = "1.0"
+serde_json = "1.0"  # for JSON handling
+clap = "4.0"        # for CLI if needed
+
+# Example main.rs file that would use temporal_planner:
+#
+# ```rust
+# use temporal_planner::{TemporalPlanner, SearchResult};
+# use anyhow::Result;
+#
+# fn main() -> Result<()> {
+#     let mut planner = TemporalPlanner::new();
+#     
+#     match planner.solve_from_files("domain.pddl", "problem.pddl")? {
+#         SearchResult::Solution(plan) => {
+#             println!("Found solution with {} actions", plan.actions.len());
+#         }
+#         SearchResult::Failure => {
+#             println!("No solution found");
+#         }
+#     }
+#     
+#     Ok(())
+# }
+# ```

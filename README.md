@@ -17,47 +17,142 @@ A high-performance temporal planning system implementing Simple Temporal Network
 - **Resource Constraints**: Support for numeric fluents and resource management
 - **Parallel Execution**: Optional parallel processing for large-scale problems
 
-## 📦 Installation
+## � Using as a Rust Library Dependency
 
-### Prerequisites
-- Rust 1.70+ 
-- Cargo (comes with Rust)
+This is the **primary way** to use the temporal planner in your Rust applications.
 
-### Build from Source
-```bash
-git clone https://github.com/caelumspace/temporal-planner.git
-cd temporal-planner
-cargo build --release
+### Adding the Dependency
+
+Add this to your project's `Cargo.toml`:
+
+```toml
+[dependencies]
+temporal_planner = { git = "https://github.com/caelumspace/temporal-planner.git" }
+
+# Optional: enable parallel processing
+# temporal_planner = { git = "https://github.com/caelumspace/temporal-planner.git", features = ["parallel"] }
+
+# For local development:
+# temporal_planner = { path = "../temporal_planner" }
 ```
 
-### Dependencies
-- `serde` - Serialization for data structures
-- `regex` - PDDL parsing and pattern matching
-- `nalgebra` - Linear algebra for temporal constraints
-- `clap` - Command-line interface
-- `anyhow` - Error handling
+### Complete Integration Example
+
+Here's a minimal working example (`src/main.rs`):
+
+```rust
+use temporal_planner::{TemporalPlanner, SearchResult};
+use anyhow::Result;
+
+fn main() -> Result<()> {
+    // Create planner instance
+    let mut planner = TemporalPlanner::new();
+
+    // Solve from PDDL files
+    match planner.solve_from_files("domain.pddl", "problem.pddl")? {
+        SearchResult::Solution(plan) => {
+            println!("✅ Found solution with {} actions", plan.actions.len());
+            println!("   Total cost: {:.2}", plan.cost);
+        }
+        SearchResult::Failure => {
+            println!("❌ No solution found");
+        }
+    }
+
+    Ok(())
+}
+```
+
+That's it! Your application now has full temporal planning capabilities.
+
+### Library Features
+
+- **Zero-copy parsing** - efficient PDDL processing
+- **Type-safe API** - leverages Rust's type system
+- **Error handling** - uses `Result` types for robust error management
+- **Thread-safe** - can be used in multi-threaded applications
+- **Memory efficient** - minimal allocations and fast execution
+
 
 ## 🎯 Quick Start
 
-### Running the PDDL Parser Demo
-```bash
-cargo run --bin pddl_parser_demo
+### Using as a Rust Library
+
+Here's how to integrate the temporal planner into your Rust application:
+
+```rust
+use temporal_planner::{TemporalPlanner, SearchResult};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create a planner instance
+    let mut planner = TemporalPlanner::new();
+    
+    // Option 1: Load PDDL from files
+    let result = planner.solve_from_files(
+        "domain.pddl", 
+        "problem.pddl"
+    )?;
+    
+    // Option 2: Load PDDL from strings
+    let domain_content = std::fs::read_to_string("domain.pddl")?;
+    let problem_content = std::fs::read_to_string("problem.pddl")?;
+    let result = planner.solve_from_content(&domain_content, &problem_content);
+    
+    // Handle the result
+    match result {
+        SearchResult::Solution(plan) => {
+            println!("✅ Found plan with {} actions", plan.actions.len());
+            println!("   Plan cost: {:.2}", plan.cost);
+            
+            for (i, action) in plan.actions.iter().enumerate() {
+                println!("   {}. {} (time: {:.2})", 
+                    i + 1, action.name, action.start_time);
+            }
+        }
+        SearchResult::Failure => {
+            println!("❌ No solution found");
+        }
+    }
+    
+    Ok(())
+}
 ```
 
-### Running End-to-End Tests
+### Parsing Only (Without Planning)
+
+```rust
+use temporal_planner::{TemporalPlanner, TemporalTask};
+
+fn analyze_pddl() -> Result<(), Box<dyn std::error::Error>> {
+    let planner = TemporalPlanner::new();
+    
+    // Parse PDDL without solving
+    let task = planner.load_pddl_files("domain.pddl", "problem.pddl")?;
+    
+    // Analyze the parsed task
+    println!("📊 Domain Analysis:");
+    println!("   Actions: {}", task.actions.len());
+    println!("   Initial facts: {}", task.initial_state.facts.len());
+    println!("   Goal conditions: {}", task.goal_conditions.len());
+    
+    for action in &task.actions {
+        println!("   Action '{}': duration={:.1}s", 
+            action.name, action.duration);
+    }
+    
+    Ok(())
+}
+```
+
+### Development and Testing
+
 ```bash
-# Basic functional tests
+# Run the built-in test executables
 cargo run --bin e2e_tests
-
-# Comprehensive test suite with metrics
 cargo run --bin comprehensive_tests
-
-# Performance benchmarks
 cargo run --bin benchmark
-```
 
-### Standard Rust Tests
-```bash
+# Run standard Rust tests
 cargo test
 ```
 
@@ -223,12 +318,30 @@ cargo run --bin benchmark
 
 ## 📚 API Documentation
 
-### Basic Usage
-```rust
-use temporal_planner::TemporalTask;
+### Core API Usage
 
-// Parse PDDL domain and problem
-let task = TemporalTask::from_pddl(domain_content, problem_content);
+The main entry point for external Rust applications:
+
+```rust
+use temporal_planner::{TemporalPlanner, TemporalTask, SearchResult};
+
+// Create planner instance
+let mut planner = TemporalPlanner::new();
+
+// Get planner information
+let info = planner.get_info();
+println!("Planner version: {}", info.version);
+println!("Search algorithm: {}", info.search_algorithm);
+```
+
+### Loading PDDL Content
+
+```rust
+// From file paths
+let task = planner.load_pddl_files("domain.pddl", "problem.pddl")?;
+
+// From string content
+let task = planner.load_pddl_content(&domain_str, &problem_str);
 
 // Access parsed information
 println!("Actions: {}", task.actions.len());
@@ -237,20 +350,73 @@ for action in &task.actions {
 }
 ```
 
-### Planning Integration
+### Planning and Solution Handling
+
 ```rust
-use temporal_planner::{TemporalAStarSearch, TemporalSearchEngine};
+// Solve with pre-loaded task
+let result = planner.solve(&task);
 
-let mut search_engine = TemporalAStarSearch::new();
-let result = search_engine.search(&task);
+// Complete pipeline methods
+let result = planner.solve_from_files("domain.pddl", "problem.pddl")?;
+let result = planner.solve_from_content(&domain_str, &problem_str);
 
+// Handle results
 match result {
     SearchResult::Solution(plan) => {
         println!("Found plan with {} actions", plan.actions.len());
+        println!("Plan cost: {:.2}", plan.cost);
+        
+        // Access individual actions
+        for action in &plan.actions {
+            println!("Action: {} at time {:.2}", action.name, action.start_time);
+        }
     }
     SearchResult::Failure => {
         println!("No solution found");
     }
+}
+```
+
+### Working with Temporal Actions
+
+```rust
+use temporal_planner::{TemporalAction, Condition, Effect};
+
+// Actions have temporal structure
+for action in &task.actions {
+    println!("Action: {}", action.name);
+    println!("  Duration: {:.2}s", action.duration);
+    println!("  Start conditions: {}", action.conditions_start.len());
+    println!("  Over-all conditions: {}", action.conditions_over_all.len());
+    println!("  End conditions: {}", action.conditions_end.len());
+    println!("  Start effects: {}", action.effects_start.len());
+    println!("  End effects: {}", action.effects_end.len());
+}
+```
+
+### Error Handling
+
+```rust
+use anyhow::Result;
+
+fn my_planning_function() -> Result<()> {
+    let mut planner = TemporalPlanner::new();
+    
+    // Methods return Results for proper error handling
+    match planner.solve_from_files("domain.pddl", "problem.pddl") {
+        Ok(SearchResult::Solution(plan)) => {
+            println!("Success! Plan has {} actions", plan.actions.len());
+        }
+        Ok(SearchResult::Failure) => {
+            println!("Planning failed - no solution exists");
+        }
+        Err(e) => {
+            eprintln!("Error during planning: {}", e);
+            return Err(e);
+        }
+    }
+    
+    Ok(())
 }
 ```
 

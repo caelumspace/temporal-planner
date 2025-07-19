@@ -3,8 +3,20 @@ name = "temporal_planner"
 version = "0.1.0"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
-description = "A temporal planning system implementing Simple Temporal Networks"
+description = "A high-performance temporal planning system with PDDL 2.1+ support and external API"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/caelumspace/temporal-planner"
+keywords = ["planning", "ai", "pddl", "temporal", "scheduling"]
+categories = ["algorithms", "science"]
+
+[lib]
+name = "temporal_planner"
+crate-type = ["lib", "cdylib"]  # Support both Rust lib and C-compatible dynamic lib
+
+[features]
+default = []
+capi = []  # Enable C API exports
+parallel = ["rayon"]  # Enable parallel processing
 
 [dependencies]
 # Core dependencies
@@ -28,9 +40,9 @@ log = "0.4"
 env_logger = "0.11.8"
 
 # Command line interface
-clap = { version = "4.4", features = ["derive"] }
+clap = { version = "4.0", features = ["derive"] }
 
-# Optional: for parallel processing
+# Optional parallel processing
 rayon = { version = "1.7", optional = true }
 
 [dev-dependencies]
@@ -38,9 +50,9 @@ criterion = "0.6.0"
 proptest = "1.2"
 pretty_assertions = "1.4"
 
-[features]
-default = []
-parallel = ["rayon"]
+[[example]]
+name = "external_integration"
+path = "examples/external_integration.rs"
 
 [[bin]]
 name = "pddl_parser_demo"

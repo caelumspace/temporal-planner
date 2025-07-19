@@ -16,3 +16,48 @@ target/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 *.lock
+
+# IDE/Editor
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test outputs
+test_results.json
+*.log
+
+# Documentation builds
+/docs/book/
+/docs/target/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Coverage reports
+tarpaulin-report.html
+cobertura.xml
+lcov.info
+
+# Benchmark results
+criterion/
+benches/target/
+
+# Local development
+.env
+local/
+
+# Profiling
+perf.data*
+*.profraw
